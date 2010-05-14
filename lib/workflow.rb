@@ -21,7 +21,7 @@ module Workflow
 
     def state(name, meta = {:meta => {}}, &events_and_etc)
       # meta[:meta] to keep the API consistent..., gah
-      new_state = Workflow::State.new(name, meta[:meta])
+      new_state = WorkflowState.new(name, meta[:meta])
       @initial_state = new_state if @states.empty?
       @states[name.to_sym] = new_state
       @scoped_state = new_state
@@ -34,7 +34,7 @@ module Workflow
         "missing ':transitions_to' in workflow event definition for '#{name}'") \
         if target.nil?
       @scoped_state.events[name.to_sym] =
-        Workflow::Event.new(name, target, (args[:meta] or {}), &action)
+        WorkflowEvent.new(name, target, (args[:meta] or {}), &action)
     end
 
     def on_entry(&proc)
@@ -67,7 +67,7 @@ module Workflow
 
   class WorkflowDefinitionError < Exception; end
 
-  class State
+  class WorkflowState
 
     attr_accessor :name, :events, :meta, :on_entry, :on_exit
 
@@ -84,7 +84,7 @@ module Workflow
     end
   end
 
-  class Event
+  class WorkflowEvent
 
     attr_accessor :name, :transitions_to, :meta, :action
 
